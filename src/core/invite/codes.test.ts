@@ -13,6 +13,11 @@ import {
   encodeCode,
 } from './codes'
 
+const GOOGLE = {
+  clientId: '123456789012-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com',
+  apiKey: 'AIzaSyA-1234567890abcdefghijklmnopqrstu',
+}
+
 const raw = (o: unknown) => toBase64url(new TextEncoder().encode(JSON.stringify(o)))
 
 async function invite(): Promise<SpaceAccess> {
@@ -45,6 +50,16 @@ describe('Codes', () => {
     expect(decodeCode(encodeCode(reply))).toEqual(reply)
   })
 
+  it('nehmen die Google-Konfiguration mit und prüfen sie', async () => {
+    const inv = { ...(await invite()), google: GOOGLE }
+    expect(decodeCode(encodeCode(inv))).toEqual(inv)
+    const body = JSON.parse(new TextDecoder().decode(Buffer.from(encodeCode(inv), 'base64url')))
+    expect(() => decodeCode(raw({ ...body, g: { c: 'evil', a: GOOGLE.apiKey } }))).toThrow(
+      /Google-Konfiguration ungültig/,
+    )
+    expect(() => decodeCode(raw({ ...body, g: 'x' }))).toThrow(CodeError)
+  })
+
   it('sind kurz genug für einen QR-Code', async () => {
     const inv = await invite()
     inv.peers = Array.from({ length: 6 }, () => ({
@@ -52,6 +67,7 @@ describe('Codes', () => {
       provider: 'gdrive',
       files: { live: 'x'.repeat(33), library: 'y'.repeat(33) },
     }))
+    inv.google = GOOGLE
     // QR Version 40, Fehlerkorrektur M, Byte-Modus: 2331 Zeichen
     expect(codeLink('https://tafelrunde.niedermaier.bayern/', inv).length).toBeLessThan(2331)
   })

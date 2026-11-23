@@ -30,9 +30,20 @@ afterEach(async () => {
   for (const ws of open.splice(0)) await ws.close()
 })
 
-async function workspace(cloud: FakeCloud, account: string, kv = new MemoryKeyValueStore()) {
+async function workspace(
+  cloud: FakeCloud,
+  account: string,
+  kv = new MemoryKeyValueStore(),
+  googleConfig?: () => { clientId: string; apiKey: string } | undefined,
+) {
   const provider = new FakeProvider(cloud, account)
-  const ws = await Workspace.open({ kv, provider, persistDoc: noPersistence, debounceMs: 10 })
+  const ws = await Workspace.open({
+    kv,
+    provider,
+    persistDoc: noPersistence,
+    debounceMs: 10,
+    ...(googleConfig ? { googleConfig } : {}),
+  })
   open.push(ws)
   return { ws, provider, kv }
 }
@@ -86,6 +97,7 @@ describe('Workspace', () => {
 
     const invite = transfer(await anna.invite(family.record.id))
     expect(invite.peers).toHaveLength(1)
+    expect(invite.google).toBeUndefined()
     const joined = await ben.join(invite)
     expect(spaceName(joined.doc)).toBe('Familie')
     expect(getItems(joined.doc, listId).map((i) => i.name)).toEqual(['Milch'])
@@ -408,5 +420,20 @@ describe('Workspace', () => {
 
     await anna.removePhoto(family.record.id, photoId)
     expect(listPhotos(family.library!.doc, recipeId)).toEqual([])
+  })
+})
+
+describe('Google-Konfiguration in Codes', () => {
+  it('reist in Einladung und Wiederherstellungscode mit', async () => {
+    const google = {
+      clientId: '123456789012-abcdefgh.apps.googleusercontent.com',
+      apiKey: 'AIzaSyA-1234567890abcdefghijklmnopqrstu',
+    }
+    const { ws } = await workspace(new FakeCloud(), 'anna', new MemoryKeyValueStore(), () => google)
+    await ws.setup('Anna', 'Laptop')
+    const family = await ws.createSpace('Familie', 'household')
+    await family.sync.flush()
+    expect(transfer(await ws.invite(family.record.id)).google).toEqual(google)
+    expect(transfer(await ws.recoveryCode(family.record.id)).google).toEqual(google)
   })
 })

@@ -29,7 +29,6 @@ path = [
   ".editorconfig",
   ".prettierrc.json",
   ".prettierignore",
-  ".env.example",
   "renovate.json",
   "lighthouserc.json",
   "release-please-config.json",

@@ -25,6 +25,11 @@ export const router = createRouter({
       props: true,
     },
     {
+      path: '/google',
+      name: 'google',
+      component: () => import('./views/GoogleSetupView.vue'),
+    },
+    {
       path: '/plan',
       name: 'plan',
       component: () => import('./views/PlanView.vue'),

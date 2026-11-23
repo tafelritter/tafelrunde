@@ -17,6 +17,7 @@
 import { fromBase64url, toBase64url } from '../crypto/base64url'
 import { isValidId } from '../crypto/ids'
 import { type FileRefs, type SpaceKind, SPACE_KINDS } from '../model/space'
+import { type GoogleConfig, parseGoogleConfig } from './google-config'
 
 const VERSION = 1
 const MAX_PEERS = 32
@@ -38,6 +39,8 @@ export interface SpaceAccess {
   name: string
   kind: SpaceKind
   peers: PeerRef[]
+  /** Google-Projekt des einladenden Geräts, damit neue Geräte ohne Einrichtung lesen können. */
+  google?: GoogleConfig
 }
 
 /** Antwort des neuen Geräts an das einladende. */
@@ -88,6 +91,7 @@ export function encodeCode(code: Code): string {
           n: code.name,
           t: code.kind,
           m: code.peers.map((p) => ({ d: p.deviceId, r: p.provider, f: compactFiles(p.files) })),
+          ...(code.google ? { g: { c: code.google.clientId, a: code.google.apiKey } } : {}),
         }
   const json = JSON.stringify({ v: VERSION, y: TYPE_TAG[code.type], ...body })
   return toBase64url(new TextEncoder().encode(json))
@@ -183,7 +187,7 @@ export function decodeCode(input: string): Code {
       const p = obj(entry, 'Gerät')
       return { deviceId: id(p.d, 'Gerät'), provider: text(p.r, 'Anbieter'), files: files(p.f) }
     })
-    return {
+    const access: SpaceAccess = {
       type: o.y === TYPE_TAG.invite ? 'invite' : 'recovery',
       spaceId: id(o.s, 'Bereich'),
       key: key(o.k),
@@ -191,6 +195,13 @@ export function decodeCode(input: string): Code {
       kind: kind(o.t),
       peers,
     }
+    if (o.g !== undefined) {
+      const g = obj(o.g, 'Google-Konfiguration')
+      const google = parseGoogleConfig({ clientId: g.c, apiKey: g.a })
+      if (!google) throw new CodeError('Google-Konfiguration ungültig')
+      access.google = google
+    }
+    return access
   }
   throw new CodeError('unbekannte Code-Art')
 }

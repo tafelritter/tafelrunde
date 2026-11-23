@@ -9,6 +9,7 @@
 import * as Y from 'yjs'
 import {
   type CatalogLookup,
+  type GoogleConfig,
   type JoinReply,
   type Peer,
   type PersistedSyncState,
@@ -82,6 +83,8 @@ export interface WorkspaceDeps {
   /** Abfrage-Intervalle (plan/01-architektur.md): 3 s in der Listenansicht, sonst 15 s. */
   intervals?: { active: number; idle: number }
   debounceMs?: number
+  /** Google-Projekt dieses Geräts; reist in Einladung und Wiederherstellungscode mit. */
+  googleConfig?: () => GoogleConfig | undefined
 }
 
 export interface DocHandle {
@@ -401,7 +404,7 @@ export class Workspace {
       .map((m) => ({ deviceId: m.deviceId, provider: m.provider, files: m.files }))
     // Bei der Einladung genügt das eigene Gerät; der Rest steht im Register.
     const selected = type === 'invite' ? peers.filter((p) => p.deviceId === self) : peers
-    return {
+    const access: SpaceAccess = {
       type,
       spaceId: id,
       key: await exportSpaceKey(handle.record.key),
@@ -409,6 +412,9 @@ export class Workspace {
       kind: handle.record.kind,
       peers: selected.length > 0 ? selected : peers.slice(0, 1),
     }
+    const google = this.deps.googleConfig?.()
+    if (google) access.google = google
+    return access
   }
 
   /**

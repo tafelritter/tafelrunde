@@ -4,20 +4,32 @@
  * Zwei Geräte über einen nachgebildeten Google-Speicher: Einladen, Antwort-Code,
  * gemeinsames Abhaken (plan/03-phase-1-einkaufsliste.md, 1.12).
  *
- * Braucht einen Build mit Google-Konfiguration:
- *   VITE_GOOGLE_CLIENT_ID=e2e VITE_GOOGLE_API_KEY=e2e pnpm build && E2E_GOOGLE=1 pnpm test:e2e
+ * Anna trägt das Google-Projekt in der App ein; Ben übernimmt es aus der
+ * Einladung (kein Build-Wert nötig).
  */
 
 import { expect, test, type Page } from '@playwright/test'
 import { FakeGoogle } from './support/fake-google'
 
-test.skip(!process.env.E2E_GOOGLE, 'Build ohne Google-Konfiguration')
+/** Platzhalter im gültigen Format; FakeGoogle prüft sie nicht. */
+const GOOGLE = {
+  clientId: '123456789012-e2etest.apps.googleusercontent.com',
+  apiKey: 'AIzaE2E-00000000000000000000000000000000',
+}
 test.describe.configure({ timeout: 90_000 })
 
 async function setup(page: Page, name: string) {
   await page.getByLabel('Dein Name').fill(name)
   await page.getByLabel('Name dieses Geräts').fill(`${name}s Gerät`)
   await page.getByRole('button', { name: 'Los geht’s' }).click()
+}
+
+async function configure(page: Page) {
+  await page.getByRole('link', { name: 'Mit Google verbinden' }).click()
+  await page.getByLabel('OAuth-Client-ID').fill(GOOGLE.clientId)
+  await page.getByLabel('API-Schlüssel').fill(GOOGLE.apiKey)
+  await page.getByRole('button', { name: 'Speichern und neu starten' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Einkaufslisten')
 }
 
 async function connect(page: Page) {
@@ -47,6 +59,7 @@ test('zwei Geräte: einladen, beitreten und gemeinsam abhaken', async ({ browser
   // Anna richtet sich ein, verbindet Google und legt den Haushalt an.
   await anna.goto('/')
   await setup(anna, 'Anna')
+  await configure(anna)
   await connect(anna)
   await anna.getByRole('button', { name: 'Haushalt anlegen' }).click()
   await anna.getByLabel('Name des Haushalts').fill('Familie')
@@ -57,6 +70,10 @@ test('zwei Geräte: einladen, beitreten und gemeinsam abhaken', async ({ browser
   // Ben öffnet die Einladung: erst Einrichtung, dann Beitritt.
   await ben.goto(invite)
   await setup(ben, 'Ben')
+  // Ben hat kein Google-Projekt: Die Einladung bringt Annas mit.
+  await expect(ben.getByText('übernimmt dabei die Google-Einstellungen')).toContainText(
+    '123456789012',
+  )
   await ben.getByRole('button', { name: 'Beitreten' }).click()
   await expect(ben.getByRole('heading', { name: 'Willkommen in „Familie“' })).toBeVisible()
   // Ben liest bereits ohne Anmeldung; zum Schreiben verbindet er Google.
@@ -86,6 +103,11 @@ test('zwei Geräte: einladen, beitreten und gemeinsam abhaken', async ({ browser
 
   // Anna sieht das Abhaken nach wenigen Sekunden (Abfrage alle 3 s in der Listenansicht).
   await expect(anna.getByRole('checkbox', { name: 'Milch' })).toBeChecked({ timeout: 15_000 })
+
+  // Ben hat das Projekt dauerhaft übernommen, das Token aber nicht gespeichert.
+  const stored = await ben.evaluate(() => JSON.stringify(localStorage))
+  expect(stored).toContain(GOOGLE.clientId)
+  expect(stored).not.toContain('token-ben')
 
   // Die Dateien in Drive sind ohne Schlüssel nicht lesbar.
   for (const file of google.files.values()) {

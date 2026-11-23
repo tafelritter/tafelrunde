@@ -14,7 +14,6 @@ Voraussetzungen: Node.js 24 (siehe `.nvmrc`) und pnpm über Corepack (`corepack 
 
 ```sh
 pnpm install
-cp .env.example .env.local   # Google-Konfiguration eintragen, siehe docs/setup/google-cloud.md
 pnpm dev                     # holt den Katalog (einmalig, aus GitHub) und startet http://localhost:5173
 ```
 

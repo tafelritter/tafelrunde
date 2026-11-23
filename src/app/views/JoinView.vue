@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <script setup lang="ts">
-import { computed, ref, shallowRef } from 'vue'
+import { computed, onMounted, ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   type JoinReply,
@@ -8,11 +8,14 @@ import {
   codeLink,
   decodeCode,
   getLists,
+  googleProjectNumber,
   spaceName,
 } from '@/core/base'
 import AppButton from '@/ui/components/AppButton.vue'
 import AppCard from '@/ui/components/AppCard.vue'
 import QrCode from '@/ui/components/QrCode.vue'
+import { rememberPendingJoin, saveGoogleConfig, takePendingJoin } from '../google-config'
+import { googleConfig } from '../storage'
 import { bumpWorkspace, workspace } from '../workspace/use-workspace'
 
 /**
@@ -44,8 +47,26 @@ const joined = shallowRef<{ spaceId: string; name: string; lists: number }>()
 const reply = shallowRef<{ code: JoinReply; link: string }>()
 const replyError = ref<string>()
 
+/**
+ * Die Einladung bringt ein Google-Projekt mit, dieses Gerät hat noch keins:
+ * Ohne Projekt kann es die Dateien der anderen nicht lesen. Beim Beitreten
+ * wird es übernommen, die App startet neu und setzt den Beitritt fort.
+ */
+const adoptsGoogle = computed(() => !!access.value?.google && !googleConfig)
+
+onMounted(() => {
+  const pending = takePendingJoin()
+  if (pending && pending === props.code && googleConfig && access.value) void join()
+})
+
 async function join() {
   if (!access.value) return
+  if (adoptsGoogle.value) {
+    saveGoogleConfig(access.value.google)
+    rememberPendingJoin(props.code)
+    location.reload()
+    return
+  }
   busy.value = true
   error.value = undefined
   try {
@@ -118,6 +139,10 @@ async function showReply() {
     <p class="muted">
       Die Daten werden direkt aus dem Speicher der anderen geladen und nur auf diesem Gerät
       entschlüsselt.
+    </p>
+    <p v-if="adoptsGoogle && access.google" class="muted">
+      Dieses Gerät übernimmt dabei die Google-Einstellungen der Einladung (Projekt-Nr.
+      {{ googleProjectNumber(access.google) }}) und startet kurz neu.
     </p>
     <div class="row">
       <AppButton variant="primary" :disabled="busy" @click="join">
