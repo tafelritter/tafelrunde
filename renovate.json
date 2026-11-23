@@ -1,0 +1,65 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    "helpers:pinGitHubActionDigests",
+    ":maintainLockFilesWeekly"
+  ],
+  "timezone": "Europe/Berlin",
+  "schedule": ["before 6am on monday"],
+  "minimumReleaseAge": "3 days",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": ["at any time"]
+  },
+  "packageRules": [
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"]
+    },
+    {
+      "groupName": "Vue und Vite",
+      "matchPackageNames": [
+        "vue",
+        "vue-router",
+        "vue-tsc",
+        "@vue/**",
+        "vite",
+        "@vitejs/**",
+        "vite-plugin-pwa",
+        "workbox-*"
+      ]
+    },
+    {
+      "groupName": "Lint und Format",
+      "matchPackageNames": ["eslint", "@eslint/**", "eslint-*", "typescript-eslint", "prettier"]
+    },
+    {
+      "groupName": "Tests",
+      "matchPackageNames": ["vitest", "@vitest/**", "@playwright/test", "@axe-core/**", "jsdom"]
+    },
+    {
+      "description": "TypeScript 7 erst, wenn vue-tsc es unterstützt",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
+    },
+    {
+      "description": "Eigene Pakete und Katalog: ohne Wartezeit, eigene PRs",
+      "matchPackageNames": ["@tafelritter/rezeptformat", "Tafelritter/katalog"],
+      "minimumReleaseAge": "0 days",
+      "schedule": ["at any time"]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Katalog-Release in katalog.json: Version und SHA-256 des Archivs (aus der .sha256-Datei am Release)",
+      "managerFilePatterns": ["/^katalog\\.json$/"],
+      "matchStrings": [
+        "\"repository\":\\s*\"(?<depName>[^\"]+)\",\\s*\"version\":\\s*\"(?<currentValue>v[^\"]+)\",\\s*\"sha256\":\\s*\"(?<currentDigest>[0-9a-f]{64})\""
+      ],
+      "datasourceTemplate": "github-release-attachments"
+    }
+  ]
+}

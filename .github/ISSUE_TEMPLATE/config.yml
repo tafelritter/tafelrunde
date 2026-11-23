@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Sicherheitslücke melden
+    url: https://github.com/Tafelritter/tafelrunde/security/advisories/new
+    about: Bitte vertraulich melden, nicht als öffentliches Issue.
+  - name: Rezept oder Zutat vorschlagen
+    url: https://github.com/Tafelritter/katalog
+    about: Öffentliche Rezepte und der Zutatenkatalog haben ein eigenes Repository.

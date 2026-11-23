@@ -1,0 +1,45 @@
+version = 1
+SPDX-PackageName = "Tafelrunde"
+SPDX-PackageDownloadLocation = "https://github.com/Tafelritter/tafelrunde"
+
+# Code: AGPL-3.0-or-later
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Stefan Niedermaier und die Mitwirkenden von Tafelrunde"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# Inhalte: Dokumentation und Planung
+[[annotations]]
+path = ["docs/**", "plan/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Stefan Niedermaier und die Mitwirkenden von Tafelrunde"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# Konfiguration und generierte Dateien ohne Schöpfungshöhe
+[[annotations]]
+path = [
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+  "katalog.json",
+  "package.json",
+  ".nvmrc",
+  ".gitignore",
+  ".gitattributes",
+  ".editorconfig",
+  ".prettierrc.json",
+  ".prettierignore",
+  ".env.example",
+  "renovate.json",
+  "lighthouserc.json",
+  "release-please-config.json",
+  ".release-please-manifest.json",
+  "CHANGELOG.md",
+  "public/CNAME",
+  "public/icons/**",
+  ".github/**",
+  "tsconfig*.json",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Stefan Niedermaier und die Mitwirkenden von Tafelrunde"
+SPDX-License-Identifier = "CC0-1.0"

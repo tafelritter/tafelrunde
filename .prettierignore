@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+dist/
+dist-spike/
+coverage/
+LICENSES/
+LICENSE
+catalog/LICENSE
+plan/
+# Ein Artikel je Zeile ist gewollt (übersichtlicher für Beiträge)
+catalog/ingredients/

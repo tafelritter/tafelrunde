@@ -1,0 +1,98 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/*
+ * Design-Tokens (plan/02-phase-0-fundament.md, 0.9). Ziel: WCAG 2.2 AA.
+ * Die Kontraste prüft src/ui/tokens.test.ts – Farbwerte nur hier ändern.
+ * Modi: Hell, Dunkel, System (ohne data-theme folgt die App dem System).
+ */
+
+:root {
+  color-scheme: light;
+  --bg: #faf8f5;
+  --surface: #ffffff;
+  --text: #1e2421;
+  --text-muted: #5c6660;
+  --primary: #2d6a4f;
+  --on-primary: #ffffff;
+  --accent: #d96b43;
+  --accent-text: #b4532f;
+  --on-accent: #1e2421;
+  --border: #e6e2dc;
+  --border-strong: #868e89;
+  --checked: #8a908c;
+  --error: #b3261e;
+  --warning: #8a5a00;
+  --success: var(--primary);
+  --focus: #2d6a4f;
+  --badge-1: #e9c46a;
+  --badge-2: #f4a261;
+  --badge-3: #8ab17d;
+  --on-badge: #1e2421;
+
+  /* Schrift: Systemschrift, keine Fremd-Fonts (docs/adr/0002-ui-grundlagen.md) */
+  --font-sans:
+    system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', Ubuntu, Cantarell, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.75rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-pill: 999px;
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 4px 12px rgb(0 0 0 / 0.06);
+  --touch-target: 2.75rem;
+  --focus-ring: 2px solid var(--focus);
+  --focus-offset: 2px;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #141715;
+  --surface: #1f2421;
+  --text: #f2efe9;
+  --text-muted: #9ba39e;
+  --primary: #52b788;
+  --on-primary: #141715;
+  --accent: #e88d67;
+  --accent-text: #e88d67;
+  --on-accent: #141715;
+  --border: #2e3531;
+  --border-strong: #68726c;
+  --checked: #6e7771;
+  --error: #f2a097;
+  --warning: #e9c46a;
+  --focus: #52b788;
+  --on-badge: #141715;
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 12px rgb(0 0 0 / 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #141715;
+    --surface: #1f2421;
+    --text: #f2efe9;
+    --text-muted: #9ba39e;
+    --primary: #52b788;
+    --on-primary: #141715;
+    --accent: #e88d67;
+    --accent-text: #e88d67;
+    --on-accent: #141715;
+    --border: #2e3531;
+    --border-strong: #68726c;
+    --checked: #6e7771;
+    --error: #f2a097;
+    --warning: #e9c46a;
+    --focus: #52b788;
+    --on-badge: #141715;
+    --shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 12px rgb(0 0 0 / 0.3);
+  }
+}

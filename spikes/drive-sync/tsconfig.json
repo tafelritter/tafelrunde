@@ -1,0 +1,5 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "compilerOptions": { "noEmit": true, "tsBuildInfoFile": null },
+  "include": ["*.ts", "auth/*.ts", "../../env.d.ts"]
+}

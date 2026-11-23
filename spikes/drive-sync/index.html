@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://www.googleapis.com ws://localhost:*; object-src 'none'; base-uri 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>Spike Drive-Sync</title>
+    <link rel="stylesheet" href="/spike.css" />
+  </head>
+  <body>
+    <h1>Spike Drive-Sync</h1>
+    <section>
+      <h2>Login</h2>
+      <p id="token-state">kein Token</p>
+      <label><input type="checkbox" id="persist" /> Token in IndexedDB bis Ablauf</label>
+      <button id="login">Anmelden</button>
+      <button id="silent">Still erneuern (prompt=none)</button>
+    </section>
+    <section>
+      <h2>Eigene Datei</h2>
+      <p>Bereich-Schlüssel (base64url, auf beiden Geräten gleich):</p>
+      <input id="key" size="50" />
+      <button id="newkey">Neuer Schlüssel</button>
+      <p>Eigene Datei-ID: <code id="own-id">–</code></p>
+      <button id="create">Datei anlegen + freigeben</button>
+      <button id="write">Stand schreiben</button>
+    </section>
+    <section>
+      <h2>Liste (Yjs)</h2>
+      <input id="item" placeholder="Eintrag" />
+      <button id="add">Hinzufügen</button>
+      <ul id="list"></ul>
+    </section>
+    <section>
+      <h2>Fremde Datei lesen (API-Key, ohne Login)</h2>
+      <input id="other-id" size="50" placeholder="Datei-ID von Gerät B" />
+      <label
+        ><input type="checkbox" id="send-referrer" /> Referrer (strict-origin) an Google
+        senden</label
+      >
+      <button id="read">Lesen + zusammenführen</button>
+      <button id="poll">1 h abfragen (3 s)</button>
+      <button id="stop">Stopp</button>
+      <p id="poll-stats"></p>
+    </section>
+    <section>
+      <h2>Protokoll</h2>
+      <button id="copy">Kopieren</button>
+      <pre id="log"></pre>
+    </section>
+    <script type="module" src="/spike.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+# Sicherheits-Overrides für transitive Abhängigkeiten (nur Build- und Testwerkzeuge).
+# Entfernen, sobald workbox-build und js-beautify/editorconfig selbst aktualisieren.
+overrides:
+  # GHSA-3g3m-2fjr-6pw4 (workbox-build → glob 11, js-beautify → glob 13)
+  'glob@>=9.0.0 <14.0.2': ^14.0.2
+  # GHSA-g3hv-75wg-m249 (editorconfig, glob → minimatch 10)
+  'minimatch@>=7.0.0 <11.0.1': ^11.0.1

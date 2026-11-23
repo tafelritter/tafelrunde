@@ -1,0 +1,19 @@
+name: Idee oder Wunsch
+description: Vorschlag für eine neue Funktion oder Verbesserung.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Welches Problem soll gelöst werden?
+    validations:
+      required: true
+  - type: textarea
+    id: vorschlag
+    attributes:
+      label: Vorschlag
+  - type: textarea
+    id: daten
+    attributes:
+      label: Datenschutz
+      description: Bleiben alle Nutzerdaten beim Nutzer? Braucht es einen Server oder Fremddienst?
